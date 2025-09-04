@@ -29,15 +29,19 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
-      <div className="max-w-md w-full space-y-8 p-8">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-primary-900 to-slate-800">
+      <div className="max-w-md w-full space-y-8 p-6">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
           <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center mb-4">
-              <Shield className="w-8 h-8 text-white" />
+            <div className="mx-auto mb-6">
+              <img 
+                src="https://res.cloudinary.com/drnak5yb2/image/upload/v1755589239/output-onlinepngtools_fnkcov.png" 
+                alt="Saher Flow Solutions" 
+                className="h-16 w-auto mx-auto"
+              />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">Admin Panel</h2>
-            <p className="mt-2 text-gray-600">Saher Flow Solutions</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Admin Panel</h2>
+            <p className="text-gray-600">Saher Flow Solutions</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -99,7 +103,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-primary py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -113,7 +117,7 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500">
               Admin access only. Contact support if you need assistance.
             </p>
           </div>

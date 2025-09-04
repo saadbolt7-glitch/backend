@@ -141,21 +141,21 @@ export default function Companies() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Companies Management</h1>
-          <p className="text-gray-600 mt-1">Manage approved companies and their domains</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Companies Management</h1>
+          <p className="text-gray-600 text-lg">Manage approved companies and their domains</p>
         </div>
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setShowInactive(!showInactive)}
-            className="btn-secondary flex items-center"
+            className="btn-secondary"
           >
             {showInactive ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
             {showInactive ? 'Hide Inactive' : 'Show All'}
           </button>
-          <button onClick={() => openModal()} className="btn-primary flex items-center">
+          <button onClick={() => openModal()} className="btn-primary">
             <Plus className="w-4 h-4 mr-2" />
             Add Company
           </button>
@@ -163,16 +163,16 @@ export default function Companies() {
       </div>
 
       {/* Companies Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredCompanies.map((company) => (
-          <div key={company._id} className="card hover:shadow-lg transition-all duration-200 border-l-4 border-l-primary-500">
+          <div key={company._id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-l-4 border-l-primary-500">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center flex-1">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Building2 className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Building2 className="w-6 h-6 text-white" />
                 </div>
-                <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">{company.name}</h3>
+                <div className="ml-3 flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">{company.name}</h3>
                   <div className="flex items-center">
                     {company.isActive ? (
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -243,7 +243,7 @@ export default function Companies() {
       </div>
 
       {filteredCompanies.length === 0 && (
-        <div className="text-center py-12">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
           <Building2 className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No companies found</h3>
           <p className="mt-1 text-sm text-gray-500">

@@ -183,20 +183,20 @@ export default function Users() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-          <p className="text-gray-600 mt-1">Manage all registered users and their permissions</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Users Management</h1>
+          <p className="text-gray-600 text-lg">Manage all registered users and their permissions</p>
         </div>
-        <button onClick={exportUsers} className="btn-secondary flex items-center">
+        <button onClick={exportUsers} className="btn-secondary">
           <Download className="w-4 h-4 mr-2" />
           Export CSV
         </button>
       </div>
 
       {/* Enhanced Filters */}
-      <div className="card">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -247,7 +247,7 @@ export default function Users() {
       </div>
 
       {/* Users Table */}
-      <div className="card p-0">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -359,7 +359,7 @@ export default function Users() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <div className="text-sm text-gray-700">
               Showing page {currentPage} of {totalPages} ({filteredUsers.length} users)
             </div>
@@ -384,7 +384,7 @@ export default function Users() {
       </div>
 
       {filteredUsers.length === 0 && !loading && (
-        <div className="text-center py-12">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
           <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
           <p className="mt-1 text-sm text-gray-500">

@@ -95,15 +95,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Overview of your platform statistics and recent activity</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600 text-lg">Overview of your platform statistics and recent activity</p>
         </div>
         <button
           onClick={loadDashboardData}
-          className="btn-secondary flex items-center"
+          className="btn-secondary"
         >
           <Filter className="w-4 h-4 mr-2" />
           Refresh Data
@@ -111,19 +111,19 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat) => {
           const Icon = stat.icon
           return (
-            <div key={stat.title} className="card hover:shadow-lg transition-all duration-200">
+            <div key={stat.title} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <div className="flex items-center">
-                <div className={`p-4 rounded-xl ${stat.color} shadow-lg`}>
-                  <Icon className="w-7 h-7 text-white" />
+                <div className={`p-3 rounded-xl ${stat.color} shadow-lg`}>
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="ml-5 flex-1">
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
-                  <span className="text-xs text-gray-500">{stat.change}</span>
+                <div className="ml-4 flex-1">
+                  <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <span className="text-xs text-gray-500 mt-1 block">{stat.change}</span>
                 </div>
               </div>
             </div>
@@ -132,15 +132,15 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Users */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Users</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">Recent Users</h3>
           <div className="space-y-3">
             {stats.recentUsers.map((user: any) => (
-              <div key={user._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={user._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
                     <span className="text-white font-medium text-xs">
                       {user.firstName[0]}{user.lastName[0]}
                     </span>
@@ -169,13 +169,13 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Companies */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Companies</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">Recent Companies</h3>
           <div className="space-y-3">
             {stats.recentCompanies.map((company: any) => (
-              <div key={company._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={company._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-500 rounded-xl flex items-center justify-center shadow-sm">
                     <Building2 className="w-4 h-4 text-white" />
                   </div>
                   <div className="ml-3">
