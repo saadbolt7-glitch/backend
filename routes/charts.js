@@ -75,8 +75,19 @@ router.get('/device/:deviceId', protect, async (req, res) => {
 // @access  Private
 router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
   try {
-    const hierarchyId = parseInt(req.params.hierarchyId);
+    // Keep raw param as string so we can validate it reliably
+    const hierarchyIdParam = req.params.hierarchyId;
     const timeRange = req.query.timeRange || 'day'; // hour, day, week, month
+
+    // Validate hierarchyId is a valid number
+    if (!hierarchyIdParam || isNaN(parseInt(hierarchyIdParam))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid hierarchy ID provided'
+      });
+    }
+
+    const hierarchyId = parseInt(hierarchyIdParam);
 
     // Check if hierarchy exists and user has access
     const hierarchy = await Hierarchy.findById(hierarchyId);
@@ -348,6 +359,108 @@ router.get('/dashboard', protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error getting dashboard data'
+    });
+  }
+});
+
+// @desc    Get raw hierarchy data for testing
+// @route   GET /api/charts/test/hierarchy/:hierarchyId
+// @access  Private
+router.get('/test/hierarchy/:hierarchyId', protect, async (req, res) => {
+  try {
+    const hierarchyId = parseInt(req.params.hierarchyId);
+    const timeRange = req.query.timeRange || 'day';
+
+    // Check if hierarchy exists and user has access
+    const hierarchy = await Hierarchy.findById(hierarchyId);
+    if (!hierarchy) {
+      return res.status(404).json({
+        success: false,
+        message: 'Hierarchy not found'
+      });
+    }
+
+    // Check if user has access to this hierarchy
+    if (req.user.role !== 'admin' && hierarchy.company_id !== req.user.company_id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied to this hierarchy'
+      });
+    }
+
+    let timeFilter = '';
+    switch (timeRange) {
+      case 'hour':
+        timeFilter = "dd.created_at >= now() - interval '1 hour'";
+        break;
+      case 'day':
+        timeFilter = "dd.created_at >= date_trunc('day', now())";
+        break;
+      case 'week':
+        timeFilter = "dd.created_at >= now() - interval '7 days'";
+        break;
+      case 'month':
+        timeFilter = "dd.created_at >= now() - interval '30 days'";
+        break;
+      default:
+        timeFilter = "dd.created_at >= date_trunc('day', now())";
+    }
+
+    // Simple query to get raw data
+    const rawQuery = `
+      WITH RECURSIVE hierarchy_cte AS (
+        SELECT id, name
+        FROM hierarchy
+        WHERE id = $1
+        UNION ALL
+        SELECT h.id, h.name
+        FROM hierarchy h
+        JOIN hierarchy_cte c ON h.parent_id = c.id
+      )
+      SELECT 
+        hc.id as hierarchy_id,
+        hc.name as hierarchy_name,
+        d.id as device_id,
+        d.serial_number,
+        dd.created_at,
+        dd.data,
+        (dd.data->>'GFR')::numeric as gfr,
+        (dd.data->>'OFR')::numeric as ofr,
+        (dd.data->>'WFR')::numeric as wfr
+      FROM hierarchy_cte hc
+      JOIN hierarchy_device hd ON hc.id = hd.hierarchy_id
+      JOIN device d ON hd.device_id = d.id
+      JOIN device_data dd ON d.id = dd.device_id
+      WHERE ${timeFilter}
+      ORDER BY dd.created_at DESC
+      LIMIT 100
+    `;
+
+    const database = require('../config/database');
+    const rawResult = await database.query(rawQuery, [hierarchyId]);
+
+    // Get aggregated data using the fixed query
+    const chartData = await Device.getHierarchyChartData(hierarchyId, timeRange);
+
+    res.json({
+      success: true,
+      message: 'Test data retrieved successfully',
+      data: {
+        hierarchy: hierarchy.toJSON(),
+        rawDataSample: rawResult.rows.slice(0, 10), // First 10 raw records
+        totalRawRecords: rawResult.rows.length,
+        chartDataPoints: chartData.length,
+        chartDataSample: chartData.slice(0, 5), // First 5 aggregated points
+        timeRange,
+        timeFilter
+      }
+    });
+  } catch (error) {
+    console.error('Test hierarchy data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error getting test data',
+      error: error.message
     });
   }
 });

@@ -306,7 +306,17 @@ router.get('/', protect, async (req, res) => {
 // @access  Private
 router.get('/:id', protect, async (req, res) => {
   try {
-    const hierarchy = await Hierarchy.findById(parseInt(req.params.id));
+    const hierarchyId = req.params.id;
+    
+    // Validate hierarchyId is a valid number
+    if (!hierarchyId || isNaN(parseInt(hierarchyId))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid hierarchy ID provided'
+      });
+    }
+
+    const hierarchy = await Hierarchy.findById(parseInt(hierarchyId));
 
     if (!hierarchy) {
       return res.status(404).json({

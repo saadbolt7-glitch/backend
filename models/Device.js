@@ -64,9 +64,20 @@ class Device {
         groupBy = "date_trunc('minute', dd.created_at)";
     }
 
-    const query = `
-      SELECT 
-        ${groupBy} AS time_period,
+    // First check what type of device this is
+    const deviceTypeQuery = `
+      SELECT dt.type_name 
+      FROM device d 
+      JOIN device_type dt ON d.device_type_id = dt.id 
+      WHERE d.id = $1
+    `;
+    const deviceTypeResult = await database.query(deviceTypeQuery, [device_id]);
+    const deviceType = deviceTypeResult.rows[0]?.type_name;
+
+    // Build dynamic query based on device type
+    let selectFields = '';
+    if (deviceType === 'MPFM') {
+      selectFields = `
         AVG((dd.data->>'GFR')::numeric) AS avg_gfr,
         AVG((dd.data->>'GOR')::numeric) AS avg_gor,
         AVG((dd.data->>'GVF')::numeric) AS avg_gvf,
@@ -74,7 +85,59 @@ class Device {
         AVG((dd.data->>'WFR')::numeric) AS avg_wfr,
         AVG((dd.data->>'WLR')::numeric) AS avg_wlr,
         AVG((dd.data->>'PressureAvg')::numeric) AS avg_pressure,
-        AVG((dd.data->>'TemperatureAvg')::numeric) AS avg_temp,
+        AVG((dd.data->>'TemperatureAvg')::numeric) AS avg_temp
+      `;
+    } else if (deviceType === 'Pressure Sensor') {
+      selectFields = `
+        NULL AS avg_gfr,
+        NULL AS avg_gor,
+        NULL AS avg_gvf,
+        NULL AS avg_ofr,
+        NULL AS avg_wfr,
+        NULL AS avg_wlr,
+        AVG((dd.data->>'Pressure')::numeric) AS avg_pressure,
+        AVG((dd.data->>'TemperatureAvg')::numeric) AS avg_temp
+      `;
+    } else if (deviceType === 'Temperature Sensor') {
+      selectFields = `
+        NULL AS avg_gfr,
+        NULL AS avg_gor,
+        NULL AS avg_gvf,
+        NULL AS avg_ofr,
+        NULL AS avg_wfr,
+        NULL AS avg_wlr,
+        AVG((dd.data->>'PressureAvg')::numeric) AS avg_pressure,
+        AVG((dd.data->>'Temperature')::numeric) AS avg_temp
+      `;
+    } else if (deviceType === 'Flow Meter') {
+      selectFields = `
+        NULL AS avg_gfr,
+        NULL AS avg_gor,
+        NULL AS avg_gvf,
+        AVG((dd.data->>'FlowRate')::numeric) AS avg_ofr,
+        NULL AS avg_wfr,
+        NULL AS avg_wlr,
+        AVG((dd.data->>'PressureAvg')::numeric) AS avg_pressure,
+        AVG((dd.data->>'TemperatureAvg')::numeric) AS avg_temp
+      `;
+    } else {
+      // Default for other device types
+      selectFields = `
+        NULL AS avg_gfr,
+        NULL AS avg_gor,
+        NULL AS avg_gvf,
+        NULL AS avg_ofr,
+        NULL AS avg_wfr,
+        NULL AS avg_wlr,
+        NULL AS avg_pressure,
+        NULL AS avg_temp
+      `;
+    }
+
+    const query = `
+      SELECT 
+        ${groupBy} AS time_period,
+        ${selectFields},
         COUNT(*) as data_points
       FROM device_data dd
       WHERE dd.device_id = $1 AND ${timeFilter}
@@ -112,24 +175,23 @@ class Device {
         groupBy = "date_trunc('minute', dd.created_at)";
     }
 
-    // Use the exact query structure provided by TL
     const query = `
       WITH RECURSIVE hierarchy_cte AS (
-        -- start from the selected hierarchy
+        -- Start from the selected hierarchy
         SELECT id
         FROM hierarchy
         WHERE id = $1
 
         UNION ALL
 
-        -- recursive step: fetch all children
+        -- Recursive step: fetch all children
         SELECT h.id
         FROM hierarchy h
         JOIN hierarchy_cte c ON h.parent_id = c.id
       ),
       devices AS (
-        -- devices attached to wells under this hierarchy
-        SELECT d.id, hd.hierarchy_id
+        -- Devices attached to hierarchies under this tree
+        SELECT d.id, d.serial_number, hd.hierarchy_id
         FROM device d
         JOIN hierarchy_device hd ON d.id = hd.device_id
         WHERE hd.hierarchy_id IN (
@@ -137,7 +199,7 @@ class Device {
         )
       ),
       device_data_minute AS (
-        -- average per device per minute
+        -- Average per device per time period
         SELECT 
           dd.device_id,
           ${groupBy} AS minute,
@@ -155,7 +217,7 @@ class Device {
         GROUP BY dd.device_id, ${groupBy}
       ),
       summed AS (
-        -- sum across devices per minute
+        -- Sum across devices per time period
         SELECT 
           minute,
           SUM(avg_gfr) AS total_gfr,
@@ -163,13 +225,13 @@ class Device {
           SUM(avg_ofr) AS total_ofr,
           SUM(avg_wfr) AS total_wfr,
           CASE 
-            WHEN (SUM(avg_gfr) + SUM(avg_ofr) + SUM(avg_wfr)) > 0 
-            THEN SUM(avg_gfr) * 100 / (SUM(avg_gfr) + SUM(avg_ofr) + SUM(avg_wfr))
+            WHEN COALESCE(SUM(avg_gfr), 0) + COALESCE(SUM(avg_ofr), 0) + COALESCE(SUM(avg_wfr), 0) > 0 
+            THEN COALESCE(SUM(avg_gfr), 0) * 100.0 / (COALESCE(SUM(avg_gfr), 0) + COALESCE(SUM(avg_ofr), 0) + COALESCE(SUM(avg_wfr), 0))
             ELSE 0 
           END AS total_gvf,
           CASE 
-            WHEN (SUM(avg_ofr) + SUM(avg_wfr)) > 0 
-            THEN SUM(avg_wfr) * 100 / (SUM(avg_ofr) + SUM(avg_wfr))
+            WHEN COALESCE(SUM(avg_ofr), 0) + COALESCE(SUM(avg_wfr), 0) > 0 
+            THEN COALESCE(SUM(avg_wfr), 0) * 100.0 / (COALESCE(SUM(avg_ofr), 0) + COALESCE(SUM(avg_wfr), 0))
             ELSE 0 
           END AS total_wlr,
           AVG(avg_pressure) AS avg_pressure,
@@ -205,6 +267,41 @@ class Device {
     return result.rows[0] || null;
   }
 
+  // Debug method to check what devices are found for a hierarchy
+  static async getDevicesForHierarchy(hierarchy_id) {
+    const query = `
+      WITH RECURSIVE hierarchy_cte AS (
+        SELECT id, name, level_id
+        FROM hierarchy
+        WHERE id = $1
+
+        UNION ALL
+
+        SELECT h.id, h.name, h.level_id
+        FROM hierarchy h
+        JOIN hierarchy_cte c ON h.parent_id = c.id
+      )
+      SELECT 
+        h.id as hierarchy_id,
+        h.name as hierarchy_name,
+        hl.name as level_name,
+        d.id as device_id,
+        d.serial_number,
+        dt.type_name,
+        COUNT(dd.id) as data_count
+      FROM hierarchy_cte h
+      JOIN hierarchy_level hl ON h.level_id = hl.id
+      LEFT JOIN hierarchy_device hd ON h.id = hd.hierarchy_id
+      LEFT JOIN device d ON hd.device_id = d.id
+      LEFT JOIN device_type dt ON d.device_type_id = dt.id
+      LEFT JOIN device_data dd ON d.id = dd.device_id AND dd.created_at >= date_trunc('day', now())
+      GROUP BY h.id, h.name, hl.name, d.id, d.serial_number, dt.type_name
+      ORDER BY h.id, d.serial_number
+    `;
+
+    const result = await database.query(query, [hierarchy_id]);
+    return result.rows;
+  }
   toJSON() {
     return {
       id: this.id,
