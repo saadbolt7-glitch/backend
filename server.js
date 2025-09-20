@@ -71,6 +71,7 @@ const companyRoutes = require('./routes/company');
 const hierarchyRoutes = require('./routes/hierarchy');
 const hierarchyLevelRoutes = require('./routes/hierarchyLevel');
 const chartsRoutes = require('./routes/charts');
+const devicesRoutes = require('./routes/devices');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -78,6 +79,7 @@ app.use('/api/company', companyRoutes);
 app.use('/api/hierarchy', hierarchyRoutes);
 app.use('/api/hierarchy-level', hierarchyLevelRoutes);
 app.use('/api/charts', chartsRoutes);
+app.use('/api/devices', devicesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
