@@ -4,6 +4,7 @@ class Device {
   constructor(data = {}) {
     this.id = data.id;
     this.company_id = data.company_id;
+    this.hierarchy_id = data.hierarchy_id;
     this.device_type_id = data.device_type_id;
     this.serial_number = data.serial_number;
     this.metadata = data.metadata;
@@ -15,10 +16,11 @@ class Device {
 
   static async findById(id) {
     const query = `
-      SELECT d.*, dt.type_name as device_type_name, c.name as company_name
+      SELECT d.*, dt.type_name as device_type_name, c.name as company_name, h.name as hierarchy_name
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
       JOIN company c ON d.company_id = c.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       WHERE d.id = $1
     `;
     const result = await database.query(query, [id]);
@@ -27,10 +29,11 @@ class Device {
 
   static async findByCompany(company_id) {
     const query = `
-      SELECT d.*, dt.type_name as device_type_name, c.name as company_name
+      SELECT d.*, dt.type_name as device_type_name, c.name as company_name, h.name as hierarchy_name
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
       JOIN company c ON d.company_id = c.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       WHERE d.company_id = $1
       ORDER BY d.serial_number
     `;
@@ -189,15 +192,6 @@ class Device {
         FROM hierarchy h
         JOIN hierarchy_cte c ON h.parent_id = c.id
       ),
-      devices AS (
-        -- Devices attached to hierarchies under this tree
-        SELECT d.id, d.serial_number, hd.hierarchy_id
-        FROM device d
-        JOIN hierarchy_device hd ON d.id = hd.device_id
-        WHERE hd.hierarchy_id IN (
-          SELECT id FROM hierarchy_cte
-        )
-      ),
       device_data_minute AS (
         -- Average per device per time period
         SELECT 
@@ -212,8 +206,8 @@ class Device {
           AVG((dd.data->>'PressureAvg')::numeric) AS avg_pressure,
           AVG((dd.data->>'TemperatureAvg')::numeric) AS avg_temp
         FROM device_data dd
-        JOIN devices d ON d.id = dd.device_id
-        WHERE ${timeFilter}
+        JOIN device d ON d.id = dd.device_id
+        WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte) AND ${timeFilter}
         GROUP BY dd.device_id, ${groupBy}
       ),
       summed AS (
@@ -291,8 +285,7 @@ class Device {
         COUNT(dd.id) as data_count
       FROM hierarchy_cte h
       JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN hierarchy_device hd ON h.id = hd.hierarchy_id
-      LEFT JOIN device d ON hd.device_id = d.id
+      LEFT JOIN device d ON h.id = d.hierarchy_id
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
       LEFT JOIN device_data dd ON d.id = dd.device_id AND dd.created_at >= date_trunc('day', now())
       GROUP BY h.id, h.name, hl.name, d.id, d.serial_number, dt.type_name
@@ -306,6 +299,7 @@ class Device {
     return {
       id: this.id,
       company_id: this.company_id,
+      hierarchy_id: this.hierarchy_id,
       device_type_id: this.device_type_id,
       serial_number: this.serial_number,
       metadata: this.metadata,

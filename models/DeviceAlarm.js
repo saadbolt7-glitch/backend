@@ -43,8 +43,7 @@ class DeviceAlarm {
       JOIN alarm_status_type ast ON da.status_id = ast.id
       LEFT JOIN device d ON da.device_serial = d.serial_number
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
       WHERE da.id = $1
     `;
@@ -118,8 +117,7 @@ class DeviceAlarm {
       JOIN alarm_status_type ast ON da.status_id = ast.id
       LEFT JOIN device d ON da.device_serial = d.serial_number
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
       WHERE ${whereConditions.join(' AND ')}
       ORDER BY da.${sort_by} ${sort_order}
@@ -137,8 +135,7 @@ class DeviceAlarm {
       JOIN alarm_status_type ast ON da.status_id = ast.id
       LEFT JOIN device d ON da.device_serial = d.serial_number
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
       WHERE ${whereConditions.join(' AND ')}
     `;
@@ -183,7 +180,7 @@ class DeviceAlarm {
       )
     `;
     
-    whereConditions.push(`h.id IN (SELECT id FROM hierarchy_cte)`);
+    whereConditions.push(`d.hierarchy_id IN (SELECT id FROM hierarchy_cte)`);
     queryParams.push(hierarchy_id);
     paramIndex++;
 
@@ -229,8 +226,7 @@ class DeviceAlarm {
       JOIN alarm_status_type ast ON da.status_id = ast.id
       LEFT JOIN device d ON da.device_serial = d.serial_number
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
       WHERE ${whereConditions.join(' AND ')}
       ORDER BY da.${sort_by} ${sort_order}
@@ -249,8 +245,7 @@ class DeviceAlarm {
       JOIN alarm_status_type ast ON da.status_id = ast.id
       LEFT JOIN device d ON da.device_serial = d.serial_number
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
       WHERE ${whereConditions.join(' AND ')}
     `;
@@ -360,8 +355,8 @@ class DeviceAlarm {
       JOIN alarm_types at ON da.alarm_type_id = at.id
       JOIN alarm_status_type ast ON da.status_id = ast.id
       LEFT JOIN device d ON da.device_serial = d.serial_number
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN device_type dt ON d.device_type_id = dt.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
       WHERE ${whereCondition}
     `;

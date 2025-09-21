@@ -73,8 +73,7 @@ router.get('/dashboard', protect, async (req, res) => {
         COUNT(DISTINCT d.id) as total_devices
       FROM hierarchy h
       JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN hierarchy_device hd ON h.id = hd.hierarchy_id
-      LEFT JOIN device d ON hd.device_id = d.id
+      LEFT JOIN device d ON d.device_id = d.id
       WHERE h.company_id = $1
     `;
     
@@ -151,8 +150,7 @@ router.get('/devices', protect, async (req, res) => {
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
       JOIN company c ON d.company_id = c.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       WHERE d.company_id = $1
       ORDER BY dt.type_name, d.serial_number
     `;
@@ -204,8 +202,7 @@ router.get('/devices/:id', protect, async (req, res) => {
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
       JOIN company c ON d.company_id = c.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       WHERE d.id = $1
     `;
 

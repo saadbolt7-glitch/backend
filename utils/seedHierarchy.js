@@ -62,7 +62,6 @@ const seedHierarchyData = async () => {
     // Clear existing data in correct order
     await database.query('TRUNCATE TABLE device_latest RESTART IDENTITY CASCADE');
     await database.query('TRUNCATE TABLE device_data RESTART IDENTITY CASCADE');
-    await database.query('TRUNCATE TABLE hierarchy_device RESTART IDENTITY CASCADE');
     await database.query('TRUNCATE TABLE device RESTART IDENTITY CASCADE');
     await database.query('TRUNCATE TABLE hierarchy RESTART IDENTITY CASCADE');
 
@@ -139,99 +138,92 @@ const seedHierarchyData = async () => {
     const deviceData = [
       // Arabco devices
       // Well-101 (hierarchy_id: 4) - Multiple devices
-      { id: 1, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-101', hierarchy_id: 4, metadata: { model: 'MPFM-X1', install_date: '2024-01-15', status: 'active', location: 'Ghawar-Well-101' } },
-      { id: 2, company_id: 1, device_type_id: 2, serial_number: 'PRES-ARB-101', hierarchy_id: 4, metadata: { model: 'PS-200', install_date: '2024-01-15', status: 'active', location: 'Ghawar-Well-101' } },
-      { id: 3, company_id: 1, device_type_id: 3, serial_number: 'TEMP-ARB-101', hierarchy_id: 4, metadata: { model: 'TS-150', install_date: '2024-01-15', status: 'active', location: 'Ghawar-Well-101' } },
+      { id: 1, company_id: 1, hierarchy_id: 4, device_type_id: 1, serial_number: 'MPFM-ARB-101', metadata: { model: 'MPFM-X1', install_date: '2024-01-15', status: 'active', location: 'Ghawar-Well-101' } },
+      { id: 2, company_id: 1, hierarchy_id: 4, device_type_id: 2, serial_number: 'PRES-ARB-101', metadata: { model: 'PS-200', install_date: '2024-01-15', status: 'active', location: 'Ghawar-Well-101' } },
+      { id: 3, company_id: 1, hierarchy_id: 4, device_type_id: 3, serial_number: 'TEMP-ARB-101', metadata: { model: 'TS-150', install_date: '2024-01-15', status: 'active', location: 'Ghawar-Well-101' } },
       
       // Well-102 (hierarchy_id: 5) - Multiple devices
-      { id: 4, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-102', hierarchy_id: 5, metadata: { model: 'MPFM-X2', install_date: '2024-02-01', status: 'active', location: 'Ghawar-Well-102' } },
-      { id: 5, company_id: 1, device_type_id: 2, serial_number: 'PRES-ARB-102', hierarchy_id: 5, metadata: { model: 'PS-201', install_date: '2024-02-01', status: 'active', location: 'Ghawar-Well-102' } },
-      { id: 6, company_id: 1, device_type_id: 4, serial_number: 'FLOW-ARB-102', hierarchy_id: 5, metadata: { model: 'FM-300', install_date: '2024-02-01', status: 'active', location: 'Ghawar-Well-102' } },
+      { id: 4, company_id: 1, hierarchy_id: 5, device_type_id: 1, serial_number: 'MPFM-ARB-102', metadata: { model: 'MPFM-X2', install_date: '2024-02-01', status: 'active', location: 'Ghawar-Well-102' } },
+      { id: 5, company_id: 1, hierarchy_id: 5, device_type_id: 2, serial_number: 'PRES-ARB-102', metadata: { model: 'PS-201', install_date: '2024-02-01', status: 'active', location: 'Ghawar-Well-102' } },
+      { id: 6, company_id: 1, hierarchy_id: 5, device_type_id: 4, serial_number: 'FLOW-ARB-102', metadata: { model: 'FM-300', install_date: '2024-02-01', status: 'active', location: 'Ghawar-Well-102' } },
       
       // Well-103 (hierarchy_id: 6) - Multiple devices
-      { id: 7, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-103', hierarchy_id: 6, metadata: { model: 'MPFM-X3', install_date: '2024-02-15', status: 'active', location: 'Ghawar-Well-103' } },
-      { id: 8, company_id: 1, device_type_id: 3, serial_number: 'TEMP-ARB-103', hierarchy_id: 6, metadata: { model: 'TS-151', install_date: '2024-02-15', status: 'active', location: 'Ghawar-Well-103' } },
-      { id: 9, company_id: 1, device_type_id: 5, serial_number: 'VIB-ARB-103', hierarchy_id: 6, metadata: { model: 'VS-100', install_date: '2024-02-15', status: 'active', location: 'Ghawar-Well-103' } },
+      { id: 7, company_id: 1, hierarchy_id: 6, device_type_id: 1, serial_number: 'MPFM-ARB-103', metadata: { model: 'MPFM-X3', install_date: '2024-02-15', status: 'active', location: 'Ghawar-Well-103' } },
+      { id: 8, company_id: 1, hierarchy_id: 6, device_type_id: 3, serial_number: 'TEMP-ARB-103', metadata: { model: 'TS-151', install_date: '2024-02-15', status: 'active', location: 'Ghawar-Well-103' } },
+      { id: 9, company_id: 1, hierarchy_id: 6, device_type_id: 5, serial_number: 'VIB-ARB-103', metadata: { model: 'VS-100', install_date: '2024-02-15', status: 'active', location: 'Ghawar-Well-103' } },
       
       // Well-201 (hierarchy_id: 8) - Multiple devices
-      { id: 10, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-201', hierarchy_id: 8, metadata: { model: 'MPFM-Y1', install_date: '2024-03-01', status: 'active', location: 'Shaybah-Well-201' } },
-      { id: 11, company_id: 1, device_type_id: 2, serial_number: 'PRES-ARB-201', hierarchy_id: 8, metadata: { model: 'PS-202', install_date: '2024-03-01', status: 'active', location: 'Shaybah-Well-201' } },
-      { id: 12, company_id: 1, device_type_id: 4, serial_number: 'FLOW-ARB-201', hierarchy_id: 8, metadata: { model: 'FM-301', install_date: '2024-03-01', status: 'active', location: 'Shaybah-Well-201' } },
+      { id: 10, company_id: 1, hierarchy_id: 8, device_type_id: 1, serial_number: 'MPFM-ARB-201', metadata: { model: 'MPFM-Y1', install_date: '2024-03-01', status: 'active', location: 'Shaybah-Well-201' } },
+      { id: 11, company_id: 1, hierarchy_id: 8, device_type_id: 2, serial_number: 'PRES-ARB-201', metadata: { model: 'PS-202', install_date: '2024-03-01', status: 'active', location: 'Shaybah-Well-201' } },
+      { id: 12, company_id: 1, hierarchy_id: 8, device_type_id: 4, serial_number: 'FLOW-ARB-201', metadata: { model: 'FM-301', install_date: '2024-03-01', status: 'active', location: 'Shaybah-Well-201' } },
       
       // Well-202 (hierarchy_id: 9) - Multiple devices
-      { id: 13, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-202', hierarchy_id: 9, metadata: { model: 'MPFM-Y2', install_date: '2024-03-15', status: 'active', location: 'Shaybah-Well-202' } },
-      { id: 14, company_id: 1, device_type_id: 3, serial_number: 'TEMP-ARB-202', hierarchy_id: 9, metadata: { model: 'TS-152', install_date: '2024-03-15', status: 'active', location: 'Shaybah-Well-202' } },
+      { id: 13, company_id: 1, hierarchy_id: 9, device_type_id: 1, serial_number: 'MPFM-ARB-202', metadata: { model: 'MPFM-Y2', install_date: '2024-03-15', status: 'active', location: 'Shaybah-Well-202' } },
+      { id: 14, company_id: 1, hierarchy_id: 9, device_type_id: 3, serial_number: 'TEMP-ARB-202', metadata: { model: 'TS-152', install_date: '2024-03-15', status: 'active', location: 'Shaybah-Well-202' } },
       
       // Well-301 (hierarchy_id: 12) - Multiple devices
-      { id: 15, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-301', hierarchy_id: 12, metadata: { model: 'MPFM-Z1', install_date: '2024-04-01', status: 'active', location: 'Berri-Well-301' } },
-      { id: 16, company_id: 1, device_type_id: 2, serial_number: 'PRES-ARB-301', hierarchy_id: 12, metadata: { model: 'PS-203', install_date: '2024-04-01', status: 'active', location: 'Berri-Well-301' } },
-      { id: 17, company_id: 1, device_type_id: 5, serial_number: 'VIB-ARB-301', hierarchy_id: 12, metadata: { model: 'VS-101', install_date: '2024-04-01', status: 'active', location: 'Berri-Well-301' } },
+      { id: 15, company_id: 1, hierarchy_id: 12, device_type_id: 1, serial_number: 'MPFM-ARB-301', metadata: { model: 'MPFM-Z1', install_date: '2024-04-01', status: 'active', location: 'Berri-Well-301' } },
+      { id: 16, company_id: 1, hierarchy_id: 12, device_type_id: 2, serial_number: 'PRES-ARB-301', metadata: { model: 'PS-203', install_date: '2024-04-01', status: 'active', location: 'Berri-Well-301' } },
+      { id: 17, company_id: 1, hierarchy_id: 12, device_type_id: 5, serial_number: 'VIB-ARB-301', metadata: { model: 'VS-101', install_date: '2024-04-01', status: 'active', location: 'Berri-Well-301' } },
       
       // Well-302 (hierarchy_id: 13) - Multiple devices
-      { id: 18, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-302', hierarchy_id: 13, metadata: { model: 'MPFM-Z2', install_date: '2024-04-15', status: 'active', location: 'Berri-Well-302' } },
-      { id: 19, company_id: 1, device_type_id: 4, serial_number: 'FLOW-ARB-302', hierarchy_id: 13, metadata: { model: 'FM-302', install_date: '2024-04-15', status: 'active', location: 'Berri-Well-302' } },
+      { id: 18, company_id: 1, hierarchy_id: 13, device_type_id: 1, serial_number: 'MPFM-ARB-302', metadata: { model: 'MPFM-Z2', install_date: '2024-04-15', status: 'active', location: 'Berri-Well-302' } },
+      { id: 19, company_id: 1, hierarchy_id: 13, device_type_id: 4, serial_number: 'FLOW-ARB-302', metadata: { model: 'FM-302', install_date: '2024-04-15', status: 'active', location: 'Berri-Well-302' } },
       
       // Well-401 (hierarchy_id: 17) - Multiple devices
-      { id: 20, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-401', hierarchy_id: 17, metadata: { model: 'MPFM-W1', install_date: '2024-05-01', status: 'active', location: 'RedSea-Well-401' } },
-      { id: 21, company_id: 1, device_type_id: 2, serial_number: 'PRES-ARB-401', hierarchy_id: 17, metadata: { model: 'PS-204', install_date: '2024-05-01', status: 'active', location: 'RedSea-Well-401' } },
-      { id: 22, company_id: 1, device_type_id: 3, serial_number: 'TEMP-ARB-401', hierarchy_id: 17, metadata: { model: 'TS-153', install_date: '2024-05-01', status: 'active', location: 'RedSea-Well-401' } },
+      { id: 20, company_id: 1, hierarchy_id: 17, device_type_id: 1, serial_number: 'MPFM-ARB-401', metadata: { model: 'MPFM-W1', install_date: '2024-05-01', status: 'active', location: 'RedSea-Well-401' } },
+      { id: 21, company_id: 1, hierarchy_id: 17, device_type_id: 2, serial_number: 'PRES-ARB-401', metadata: { model: 'PS-204', install_date: '2024-05-01', status: 'active', location: 'RedSea-Well-401' } },
+      { id: 22, company_id: 1, hierarchy_id: 17, device_type_id: 3, serial_number: 'TEMP-ARB-401', metadata: { model: 'TS-153', install_date: '2024-05-01', status: 'active', location: 'RedSea-Well-401' } },
       
       // Well-402 (hierarchy_id: 18) - Multiple devices
-      { id: 23, company_id: 1, device_type_id: 1, serial_number: 'MPFM-ARB-402', hierarchy_id: 18, metadata: { model: 'MPFM-W2', install_date: '2024-05-15', status: 'active', location: 'RedSea-Well-402' } },
-      { id: 24, company_id: 1, device_type_id: 5, serial_number: 'VIB-ARB-402', hierarchy_id: 18, metadata: { model: 'VS-102', install_date: '2024-05-15', status: 'active', location: 'RedSea-Well-402' } },
+      { id: 23, company_id: 1, hierarchy_id: 18, device_type_id: 1, serial_number: 'MPFM-ARB-402', metadata: { model: 'MPFM-W2', install_date: '2024-05-15', status: 'active', location: 'RedSea-Well-402' } },
+      { id: 24, company_id: 1, hierarchy_id: 18, device_type_id: 5, serial_number: 'VIB-ARB-402', metadata: { model: 'VS-102', install_date: '2024-05-15', status: 'active', location: 'RedSea-Well-402' } },
       
       // Saher Flow devices
       // Demo Well A1 (hierarchy_id: 22) - Multiple devices
-      { id: 25, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-A1', hierarchy_id: 22, metadata: { model: 'MPFM-Demo-1', install_date: '2024-06-01', status: 'active', location: 'Demo-Alpha-A1' } },
-      { id: 26, company_id: 2, device_type_id: 2, serial_number: 'PRES-SHR-A1', hierarchy_id: 22, metadata: { model: 'PS-Demo-1', install_date: '2024-06-01', status: 'active', location: 'Demo-Alpha-A1' } },
-      { id: 27, company_id: 2, device_type_id: 3, serial_number: 'TEMP-SHR-A1', hierarchy_id: 22, metadata: { model: 'TS-Demo-1', install_date: '2024-06-01', status: 'active', location: 'Demo-Alpha-A1' } },
+      { id: 25, company_id: 2, hierarchy_id: 22, device_type_id: 1, serial_number: 'MPFM-SHR-A1', metadata: { model: 'MPFM-Demo-1', install_date: '2024-06-01', status: 'active', location: 'Demo-Alpha-A1' } },
+      { id: 26, company_id: 2, hierarchy_id: 22, device_type_id: 2, serial_number: 'PRES-SHR-A1', metadata: { model: 'PS-Demo-1', install_date: '2024-06-01', status: 'active', location: 'Demo-Alpha-A1' } },
+      { id: 27, company_id: 2, hierarchy_id: 22, device_type_id: 3, serial_number: 'TEMP-SHR-A1', metadata: { model: 'TS-Demo-1', install_date: '2024-06-01', status: 'active', location: 'Demo-Alpha-A1' } },
       
       // Demo Well A2 (hierarchy_id: 23) - Multiple devices
-      { id: 28, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-A2', hierarchy_id: 23, metadata: { model: 'MPFM-Demo-2', install_date: '2024-06-15', status: 'active', location: 'Demo-Alpha-A2' } },
-      { id: 29, company_id: 2, device_type_id: 4, serial_number: 'FLOW-SHR-A2', hierarchy_id: 23, metadata: { model: 'FM-Demo-1', install_date: '2024-06-15', status: 'active', location: 'Demo-Alpha-A2' } },
+      { id: 28, company_id: 2, hierarchy_id: 23, device_type_id: 1, serial_number: 'MPFM-SHR-A2', metadata: { model: 'MPFM-Demo-2', install_date: '2024-06-15', status: 'active', location: 'Demo-Alpha-A2' } },
+      { id: 29, company_id: 2, hierarchy_id: 23, device_type_id: 4, serial_number: 'FLOW-SHR-A2', metadata: { model: 'FM-Demo-1', install_date: '2024-06-15', status: 'active', location: 'Demo-Alpha-A2' } },
       
       // Demo Well B1 (hierarchy_id: 25) - Multiple devices
-      { id: 30, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-B1', hierarchy_id: 25, metadata: { model: 'MPFM-Demo-3', install_date: '2024-07-01', status: 'active', location: 'Demo-Beta-B1' } },
-      { id: 31, company_id: 2, device_type_id: 2, serial_number: 'PRES-SHR-B1', hierarchy_id: 25, metadata: { model: 'PS-Demo-2', install_date: '2024-07-01', status: 'active', location: 'Demo-Beta-B1' } },
-      { id: 32, company_id: 2, device_type_id: 5, serial_number: 'VIB-SHR-B1', hierarchy_id: 25, metadata: { model: 'VS-Demo-1', install_date: '2024-07-01', status: 'active', location: 'Demo-Beta-B1' } },
+      { id: 30, company_id: 2, hierarchy_id: 25, device_type_id: 1, serial_number: 'MPFM-SHR-B1', metadata: { model: 'MPFM-Demo-3', install_date: '2024-07-01', status: 'active', location: 'Demo-Beta-B1' } },
+      { id: 31, company_id: 2, hierarchy_id: 25, device_type_id: 2, serial_number: 'PRES-SHR-B1', metadata: { model: 'PS-Demo-2', install_date: '2024-07-01', status: 'active', location: 'Demo-Beta-B1' } },
+      { id: 32, company_id: 2, hierarchy_id: 25, device_type_id: 5, serial_number: 'VIB-SHR-B1', metadata: { model: 'VS-Demo-1', install_date: '2024-07-01', status: 'active', location: 'Demo-Beta-B1' } },
       
       // Demo Well B2 (hierarchy_id: 26) - Multiple devices
-      { id: 33, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-B2', hierarchy_id: 26, metadata: { model: 'MPFM-Demo-4', install_date: '2024-07-15', status: 'active', location: 'Demo-Beta-B2' } },
-      { id: 34, company_id: 2, device_type_id: 3, serial_number: 'TEMP-SHR-B2', hierarchy_id: 26, metadata: { model: 'TS-Demo-2', install_date: '2024-07-15', status: 'active', location: 'Demo-Beta-B2' } },
+      { id: 33, company_id: 2, hierarchy_id: 26, device_type_id: 1, serial_number: 'MPFM-SHR-B2', metadata: { model: 'MPFM-Demo-4', install_date: '2024-07-15', status: 'active', location: 'Demo-Beta-B2' } },
+      { id: 34, company_id: 2, hierarchy_id: 26, device_type_id: 3, serial_number: 'TEMP-SHR-B2', metadata: { model: 'TS-Demo-2', install_date: '2024-07-15', status: 'active', location: 'Demo-Beta-B2' } },
       
       // Well-D1 (hierarchy_id: 29) - Multiple devices
-      { id: 35, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-D1', hierarchy_id: 29, metadata: { model: 'MPFM-UAE-1', install_date: '2024-08-01', status: 'active', location: 'Dubai-Well-D1' } },
-      { id: 36, company_id: 2, device_type_id: 2, serial_number: 'PRES-SHR-D1', hierarchy_id: 29, metadata: { model: 'PS-UAE-1', install_date: '2024-08-01', status: 'active', location: 'Dubai-Well-D1' } },
-      { id: 37, company_id: 2, device_type_id: 5, serial_number: 'VIB-SHR-D1', hierarchy_id: 29, metadata: { model: 'VS-UAE-1', install_date: '2024-08-01', status: 'active', location: 'Dubai-Well-D1' } },
+      { id: 35, company_id: 2, hierarchy_id: 29, device_type_id: 1, serial_number: 'MPFM-SHR-D1', metadata: { model: 'MPFM-UAE-1', install_date: '2024-08-01', status: 'active', location: 'Dubai-Well-D1' } },
+      { id: 36, company_id: 2, hierarchy_id: 29, device_type_id: 2, serial_number: 'PRES-SHR-D1', metadata: { model: 'PS-UAE-1', install_date: '2024-08-01', status: 'active', location: 'Dubai-Well-D1' } },
+      { id: 37, company_id: 2, hierarchy_id: 29, device_type_id: 5, serial_number: 'VIB-SHR-D1', metadata: { model: 'VS-UAE-1', install_date: '2024-08-01', status: 'active', location: 'Dubai-Well-D1' } },
       
       // Well-D2 (hierarchy_id: 30) - Multiple devices
-      { id: 38, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-D2', hierarchy_id: 30, metadata: { model: 'MPFM-UAE-2', install_date: '2024-08-15', status: 'active', location: 'Dubai-Well-D2' } },
-      { id: 39, company_id: 2, device_type_id: 4, serial_number: 'FLOW-SHR-D2', hierarchy_id: 30, metadata: { model: 'FM-UAE-1', install_date: '2024-08-15', status: 'active', location: 'Dubai-Well-D2' } },
+      { id: 38, company_id: 2, hierarchy_id: 30, device_type_id: 1, serial_number: 'MPFM-SHR-D2', metadata: { model: 'MPFM-UAE-2', install_date: '2024-08-15', status: 'active', location: 'Dubai-Well-D2' } },
+      { id: 39, company_id: 2, hierarchy_id: 30, device_type_id: 4, serial_number: 'FLOW-SHR-D2', metadata: { model: 'FM-UAE-1', install_date: '2024-08-15', status: 'active', location: 'Dubai-Well-D2' } },
       
       // Well-E1 (hierarchy_id: 34) - Multiple devices
-      { id: 40, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-E1', hierarchy_id: 34, metadata: { model: 'MPFM-EGY-1', install_date: '2024-09-01', status: 'active', location: 'Cairo-Well-E1' } },
-      { id: 41, company_id: 2, device_type_id: 3, serial_number: 'TEMP-SHR-E1', hierarchy_id: 34, metadata: { model: 'TS-EGY-1', install_date: '2024-09-01', status: 'active', location: 'Cairo-Well-E1' } },
+      { id: 40, company_id: 2, hierarchy_id: 34, device_type_id: 1, serial_number: 'MPFM-SHR-E1', metadata: { model: 'MPFM-EGY-1', install_date: '2024-09-01', status: 'active', location: 'Cairo-Well-E1' } },
+      { id: 41, company_id: 2, hierarchy_id: 34, device_type_id: 3, serial_number: 'TEMP-SHR-E1', metadata: { model: 'TS-EGY-1', install_date: '2024-09-01', status: 'active', location: 'Cairo-Well-E1' } },
       
       // Well-E2 (hierarchy_id: 35) - Multiple devices
-      { id: 42, company_id: 2, device_type_id: 1, serial_number: 'MPFM-SHR-E2', hierarchy_id: 35, metadata: { model: 'MPFM-EGY-2', install_date: '2024-09-15', status: 'active', location: 'Cairo-Well-E2' } },
-      { id: 43, company_id: 2, device_type_id: 2, serial_number: 'PRES-SHR-E2', hierarchy_id: 35, metadata: { model: 'PS-EGY-1', install_date: '2024-09-15', status: 'active', location: 'Cairo-Well-E2' } },
-      { id: 44, company_id: 2, device_type_id: 4, serial_number: 'FLOW-SHR-E2', hierarchy_id: 35, metadata: { model: 'FM-EGY-1', install_date: '2024-09-15', status: 'active', location: 'Cairo-Well-E2' } }
+      { id: 42, company_id: 2, hierarchy_id: 35, device_type_id: 1, serial_number: 'MPFM-SHR-E2', metadata: { model: 'MPFM-EGY-2', install_date: '2024-09-15', status: 'active', location: 'Cairo-Well-E2' } },
+      { id: 43, company_id: 2, hierarchy_id: 35, device_type_id: 2, serial_number: 'PRES-SHR-E2', metadata: { model: 'PS-EGY-1', install_date: '2024-09-15', status: 'active', location: 'Cairo-Well-E2' } },
+      { id: 44, company_id: 2, hierarchy_id: 35, device_type_id: 4, serial_number: 'FLOW-SHR-E2', metadata: { model: 'FM-EGY-1', install_date: '2024-09-15', status: 'active', location: 'Cairo-Well-E2' } }
     ];
 
     // Insert devices
     for (const device of deviceData) {
       await database.query(`
-        INSERT INTO device (id, company_id, device_type_id, serial_number, metadata) 
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO device (id, company_id, hierarchy_id, device_type_id, serial_number, metadata) 
+        VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (id) DO NOTHING
-      `, [device.id, device.company_id, device.device_type_id, device.serial_number, JSON.stringify(device.metadata)]);
-      
-      // Link device to hierarchy
-      await database.query(`
-        INSERT INTO hierarchy_device (hierarchy_id, device_id) 
-        VALUES ($1, $2)
-        ON CONFLICT DO NOTHING
-      `, [device.hierarchy_id, device.id]);
+      `, [device.id, device.company_id, device.hierarchy_id, device.device_type_id, device.serial_number, JSON.stringify(device.metadata)]);
     }
 
     // Generate comprehensive device data for the last 24 hours
@@ -361,8 +353,7 @@ const seedHierarchyData = async () => {
       FROM hierarchy h
       JOIN company c ON h.company_id = c.id
       JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN hierarchy_device hd ON h.id = hd.hierarchy_id
-      LEFT JOIN device_data dd ON hd.device_id = dd.device_id
+      LEFT JOIN device_data dd ON d.device_id = dd.device_id
       GROUP BY c.name, h.name, hl.name, h.parent_id, h.id, hl.level_order
       ORDER BY c.name, hl.level_order, h.name
     `);
@@ -400,8 +391,7 @@ const seedHierarchyData = async () => {
       FROM company c
       LEFT JOIN hierarchy h ON c.id = h.company_id
       LEFT JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN hierarchy_device hd ON h.id = hd.hierarchy_id
-      LEFT JOIN device d ON hd.device_id = d.id
+      LEFT JOIN device d ON d.device_id = d.id
       LEFT JOIN device_data dd ON d.id = dd.device_id
       GROUP BY c.name
       ORDER BY c.name

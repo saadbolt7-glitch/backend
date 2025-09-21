@@ -111,21 +111,11 @@ class Database {
         CREATE TABLE IF NOT EXISTS device (
           id BIGSERIAL PRIMARY KEY,
           company_id BIGINT NOT NULL REFERENCES company(id) ON DELETE CASCADE,
+          hierarchy_id BIGINT REFERENCES hierarchy(id) ON DELETE SET NULL,
           device_type_id BIGINT NOT NULL REFERENCES device_type(id),
           serial_number TEXT NOT NULL UNIQUE,
           metadata JSONB,
           created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-        )
-      `);
-
-      // Create hierarchy_device table (many-to-many relationship)
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS hierarchy_device (
-          id BIGSERIAL PRIMARY KEY,
-          hierarchy_id BIGINT NOT NULL REFERENCES hierarchy(id) ON DELETE CASCADE,
-          device_id BIGINT NOT NULL REFERENCES device(id) ON DELETE CASCADE,
-          attached_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-          UNIQUE(hierarchy_id, device_id)
         )
       `);
 
@@ -188,9 +178,8 @@ class Database {
         CREATE INDEX IF NOT EXISTS idx_hierarchy_company_id ON hierarchy(company_id);
         CREATE INDEX IF NOT EXISTS idx_hierarchy_parent_id ON hierarchy(parent_id);
         CREATE INDEX IF NOT EXISTS idx_hierarchy_level_id ON hierarchy(level_id);
-        CREATE INDEX IF NOT EXISTS idx_hierarchy_device_hierarchy_id ON hierarchy_device(hierarchy_id);
-        CREATE INDEX IF NOT EXISTS idx_hierarchy_device_device_id ON hierarchy_device(device_id);
         CREATE INDEX IF NOT EXISTS idx_device_company_id ON device(company_id);
+        CREATE INDEX IF NOT EXISTS idx_device_hierarchy_id ON device(hierarchy_id);
         CREATE INDEX IF NOT EXISTS idx_device_serial ON device(serial_number);
         CREATE INDEX IF NOT EXISTS idx_device_data_device_created_at ON device_data(device_id, created_at DESC);
         CREATE INDEX IF NOT EXISTS brin_device_data_created_at ON device_data USING brin(created_at);

@@ -61,17 +61,16 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
       devices AS (
         SELECT 
           d.id, 
-          hd.hierarchy_id, 
+          d.hierarchy_id, 
           d.serial_number AS device_serial, 
           h.name AS hierarchy_name,
           dt.type_name AS device_name,
           dt.logo AS device_logo,
           d.metadata
         FROM device d
-        JOIN hierarchy_device hd ON d.id = hd.device_id
-        JOIN hierarchy h ON h.id = hd.hierarchy_id
+        JOIN hierarchy h ON h.id = d.hierarchy_id
         JOIN device_type dt ON d.device_type_id = dt.id
-        WHERE hd.hierarchy_id IN (SELECT id FROM hierarchy_cte)
+        WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte)
       )
       SELECT 
         d.id AS device_id,
@@ -145,12 +144,11 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
         COUNT(DISTINCT d.id) as total_devices,
         COUNT(DISTINCT CASE WHEN l.updated_at >= now() - interval '5 minutes' THEN d.id END) as online_devices,
         COUNT(DISTINCT dt.type_name) as device_types,
-        COUNT(DISTINCT hd.hierarchy_id) as locations
+        COUNT(DISTINCT d.hierarchy_id) as locations
       FROM device d
-      JOIN hierarchy_device hd ON d.id = hd.device_id
       JOIN device_type dt ON d.device_type_id = dt.id
       LEFT JOIN device_latest l ON l.device_id = d.id
-      WHERE hd.hierarchy_id IN (SELECT id FROM hierarchy_cte)
+      WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte)
     `;
 
     const statsResult = await database.query(statsQuery, [hierarchyId]);
@@ -169,9 +167,8 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
       )
       SELECT DISTINCT dt.type_name
       FROM device d
-      JOIN hierarchy_device hd ON d.id = hd.device_id
       JOIN device_type dt ON d.device_type_id = dt.id
-      WHERE hd.hierarchy_id IN (SELECT id FROM hierarchy_cte)
+      WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte)
       ORDER BY dt.type_name
     `;
 
@@ -280,8 +277,7 @@ router.get('/', protect, async (req, res) => {
         COALESCE((l.data->>'TemperatureAvg')::numeric, 0) AS temperature
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN hierarchy_level hl ON h.level_id = hl.id
       LEFT JOIN device_latest l ON l.device_id = d.id
       WHERE d.company_id = $1
@@ -324,8 +320,7 @@ router.get('/', protect, async (req, res) => {
       SELECT COUNT(DISTINCT d.id) as total
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN device_latest l ON l.device_id = d.id
       WHERE d.company_id = $1
     `;
@@ -334,7 +329,7 @@ router.get('/', protect, async (req, res) => {
     let countParamIndex = 2;
 
     if (search) {
-      countQuery += ` AND (d.serial_number ILIKE $${countParamIndex} OR dt.type_name ILIKE $${countParamIndex} OR h.name ILIKE $${countParamIndex})`;
+      countQuery += ` AND (d.serial_number ILIKE $${countParamIndex} OR dt.type_name ILIKE $${countParamIndex} OR COALESCE(h.name, '') ILIKE $${countParamIndex})`;
       countParams.push(`%${search}%`);
       countParamIndex++;
     }
@@ -478,8 +473,7 @@ router.get('/:id', protect, async (req, res) => {
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
       JOIN company c ON d.company_id = c.id
-      LEFT JOIN hierarchy_device hd ON d.id = hd.device_id
-      LEFT JOIN hierarchy h ON hd.hierarchy_id = h.id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN hierarchy_level hl ON h.level_id = hl.id
       LEFT JOIN device_latest l ON l.device_id = d.id
       WHERE d.id = $1

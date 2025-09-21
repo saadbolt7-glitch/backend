@@ -120,8 +120,7 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
       SELECT d.*, dt.type_name as device_type_name, h.name as hierarchy_name,
              dl.data as latest_data, dl.updated_at as latest_data_time
       FROM device d
-      JOIN device_type dt ON d.device_type_id = dt.id
-      JOIN hierarchy_device hd ON d.id = hd.device_id
+      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       JOIN hierarchy h ON hd.hierarchy_id = h.id
       LEFT JOIN device_latest dl ON d.id = dl.device_id
       WHERE hd.hierarchy_id IN (SELECT id FROM hierarchy_cte)
@@ -414,7 +413,7 @@ router.get('/test/hierarchy/:hierarchyId', protect, async (req, res) => {
         WHERE id = $1
         UNION ALL
         SELECT h.id, h.name
-        FROM hierarchy h
+      WHERE d.hierarchy_id IN (
         JOIN hierarchy_cte c ON h.parent_id = c.id
       )
       SELECT 
@@ -428,8 +427,7 @@ router.get('/test/hierarchy/:hierarchyId', protect, async (req, res) => {
         (dd.data->>'OFR')::numeric as ofr,
         (dd.data->>'WFR')::numeric as wfr
       FROM hierarchy_cte hc
-      JOIN hierarchy_device hd ON hc.id = hd.hierarchy_id
-      JOIN device d ON hd.device_id = d.id
+      JOIN device d ON hc.id = d.hierarchy_id
       JOIN device_data dd ON d.id = dd.device_id
       WHERE ${timeFilter}
       ORDER BY dd.created_at DESC
