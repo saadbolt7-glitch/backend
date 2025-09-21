@@ -112,19 +112,24 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
     // Get devices under this hierarchy
     const database = require('../config/database');
     const devicesQuery = `
-      WITH RECURSIVE hierarchy_cte AS (
-        SELECT id FROM hierarchy WHERE id = $1
-        UNION ALL
-        SELECT h.id FROM hierarchy h JOIN hierarchy_cte c ON h.parent_id = c.id
-      )
-      SELECT d.*, dt.type_name as device_type_name, h.name as hierarchy_name,
-             dl.data as latest_data, dl.updated_at as latest_data_time
-      FROM device d
-      LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
-      JOIN hierarchy h ON hd.hierarchy_id = h.id
-      LEFT JOIN device_latest dl ON d.id = dl.device_id
-      WHERE hd.hierarchy_id IN (SELECT id FROM hierarchy_cte)
-      ORDER BY d.serial_number
+    WITH RECURSIVE hierarchy_cte AS (
+  SELECT id FROM hierarchy WHERE id = $1
+  UNION ALL
+  SELECT h.id
+  FROM hierarchy h
+  JOIN hierarchy_cte c ON h.parent_id = c.id
+)
+SELECT d.*,
+       dt.type_name       AS device_type_name,
+       h.name             AS hierarchy_name,
+       dl.data            AS latest_data,
+       dl.updated_at      AS latest_data_time
+FROM device d
+LEFT JOIN device_type dt   ON d.device_type_id = dt.id
+LEFT JOIN hierarchy h      ON d.hierarchy_id = h.id
+LEFT JOIN device_latest dl ON d.id = dl.device_id
+WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte)
+ORDER BY d.serial_number;
     `;
     
     const devicesResult = await database.query(devicesQuery, [hierarchyId]);

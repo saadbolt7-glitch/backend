@@ -65,16 +65,17 @@ router.get('/dashboard', protect, async (req, res) => {
     // Get detailed statistics
     const statsQuery = `
       SELECT 
-        COUNT(DISTINCT h.id) as total_locations,
-        COUNT(DISTINCT CASE WHEN hl.name = 'Region' THEN h.id END) as regions,
-        COUNT(DISTINCT CASE WHEN hl.name = 'Area' THEN h.id END) as areas,
-        COUNT(DISTINCT CASE WHEN hl.name = 'Field' THEN h.id END) as fields,
-        COUNT(DISTINCT CASE WHEN hl.name = 'Well' THEN h.id END) as wells,
-        COUNT(DISTINCT d.id) as total_devices
-      FROM hierarchy h
-      JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN device d ON d.device_id = d.id
-      WHERE h.company_id = $1
+  COUNT(DISTINCT h.id) AS total_locations,
+  COUNT(DISTINCT CASE WHEN hl.name = 'Region' THEN h.id END) AS regions,
+  COUNT(DISTINCT CASE WHEN hl.name = 'Area'   THEN h.id END) AS areas,
+  COUNT(DISTINCT CASE WHEN hl.name = 'Field'  THEN h.id END) AS fields,
+  COUNT(DISTINCT CASE WHEN hl.name = 'Well'   THEN h.id END) AS wells,
+  COUNT(DISTINCT d.id) AS total_devices
+FROM hierarchy h
+JOIN hierarchy_level hl ON h.level_id = hl.id
+LEFT JOIN device d ON d.hierarchy_id = h.id   -- ← fixed here
+WHERE h.company_id = $1;
+
     `;
     
     const statsResult = await database.query(statsQuery, [company_id]);
