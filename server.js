@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const database = require('./config/database');
 const seedCompanies = require('./utils/seedCompanies');
 const seedAdmin = require('./utils/seedAdmin');
+const seedAlarms = require('./utils/seedAlarms');
 
 // Load environment variables
 dotenv.config();
@@ -72,6 +73,7 @@ const hierarchyRoutes = require('./routes/hierarchy');
 const hierarchyLevelRoutes = require('./routes/hierarchyLevel');
 const chartsRoutes = require('./routes/charts');
 const devicesRoutes = require('./routes/devices');
+const alarmsRoutes = require('./routes/alarms');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -80,6 +82,7 @@ app.use('/api/hierarchy', hierarchyRoutes);
 app.use('/api/hierarchy-level', hierarchyLevelRoutes);
 app.use('/api/charts', chartsRoutes);
 app.use('/api/devices', devicesRoutes);
+app.use('/api/alarms', alarmsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -116,6 +119,7 @@ const startServer = async () => {
   // Run seeders (do not block start if they fail)
   seedCompanies().catch((err) => console.error('seedCompanies error:', err));
   seedAdmin().catch((err) => console.error('seedAdmin error:', err));
+  seedAlarms().catch((err) => console.error('seedAlarms error:', err));
   
   // Seed device types
   // Seed hierarchy data
