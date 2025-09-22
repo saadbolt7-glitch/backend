@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const database = require('./config/database');
 const seedCompanies = require('./utils/seedCompanies');
 const seedAdmin = require('./utils/seedAdmin');
-const seedAlarms = require('./utils/seedAlarms');
+const cors = require('cors');
 
 // Load environment variables
 dotenv.config();
@@ -21,45 +21,55 @@ const allowedOrigins = rawClientUrls
   .filter(Boolean);
 
 // include common dev origins as fallback if none provided
-if (allowedOrigins.length === 0) {
-  allowedOrigins.push('http://localhost:5173', 'http://localhost:3001', 'http://localhost:3000');
-}
+// if (allowedOrigins.length === 0) {
+//   allowedOrigins.push('http://localhost:5173', 'http://localhost:3001', 'http://localhost:3000');
+// }
 
 // --- CORS - manual middleware that reliably sets headers for allowed origins ---
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
 
-  // If no origin (server-to-server or curl) allow it by default
-  if (!origin) {
-    if (req.method === 'OPTIONS') {
+app.use(cors());
+ app.use((req, res, next) => {
+//   const origin = req.headers.origin;
+
+//   // If no origin (server-to-server or curl) allow it by default
+  // if (!origin) {
+          res.setHeader('Access-Control-Allow-Origin', '*'); // allow any origin
       res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-      return res.sendStatus(200);
-    }
-    return next();
-  }
+if (req.method === 'OPTIONS') {
+       return res.sendStatus(200);
+     }
+     return next();
+   //}
 
-  // If origin is in allowed list, reflect it and set other CORS headers
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  // // If origin is in allowed list, reflect it and set other CORS headers
+  // if (allowedOrigins.includes(origin)) {
+  //   res.setHeader('Access-Control-Allow-Origin', origin);
+  //   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
-    // Preflight short-circuit
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
+  //   // Preflight short-circuit
+  //   if (req.method === 'OPTIONS') {
+  //     return res.sendStatus(200);
+  //   }
 
-    return next();
-  }
+  //   return next();
+  // }
 
-  // Origin not allowed — respond with 403 JSON (helps debugging in dev)
-  return res.status(403).json({
-    success: false,
-    message: `CORS policy: Origin ${origin} is not allowed. Add it to CLIENT_URL in your .env.`
-  });
+  // // Origin not allowed — respond with 403 JSON (helps debugging in dev)
+  // return res.status(403).json({
+  //   success: false,
+  //   message: `CORS policy: Origin ${origin} is not allowed. Add it to CLIENT_URL in your .env.`
+  // });
 });
+
+
+// app.use(cors());
+
+// app.use(cors({
+//   origin: "*"
+// }));
 
 // --- Body parsers ---
 app.use(express.json());
@@ -73,7 +83,6 @@ const hierarchyRoutes = require('./routes/hierarchy');
 const hierarchyLevelRoutes = require('./routes/hierarchyLevel');
 const chartsRoutes = require('./routes/charts');
 const devicesRoutes = require('./routes/devices');
-const alarmsRoutes = require('./routes/alarms');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -82,7 +91,6 @@ app.use('/api/hierarchy', hierarchyRoutes);
 app.use('/api/hierarchy-level', hierarchyLevelRoutes);
 app.use('/api/charts', chartsRoutes);
 app.use('/api/devices', devicesRoutes);
-app.use('/api/alarms', alarmsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -119,7 +127,6 @@ const startServer = async () => {
   // Run seeders (do not block start if they fail)
   seedCompanies().catch((err) => console.error('seedCompanies error:', err));
   seedAdmin().catch((err) => console.error('seedAdmin error:', err));
-  seedAlarms().catch((err) => console.error('seedAlarms error:', err));
   
   // Seed device types
   // Seed hierarchy data

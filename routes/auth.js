@@ -150,7 +150,10 @@ router.post('/register', validateEmailMiddleware, validateCompanyDomain, [
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
+
+
 router.post('/login', [
+  
   body('email')
     .isEmail()
     .normalizeEmail()
