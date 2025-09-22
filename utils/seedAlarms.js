@@ -124,7 +124,12 @@ const seedAlarmStatuses = async () => {
 const seedDeviceAlarms = async () => {
   try {
     // Clear existing device alarms
-    await database.query('TRUNCATE TABLE device_alarms RESTART IDENTITY CASCADE');
+    // Check if alarms already exist
+    const existingAlarms = await database.query('SELECT COUNT(*) as count FROM device_alarms');
+    if (parseInt(existingAlarms.rows[0].count) > 0) {
+      console.log('Device alarms already exist. Skipping seed.');
+      return;
+    }
 
     // Get all devices to create realistic alarms
     const devicesResult = await database.query(`
@@ -135,11 +140,16 @@ const seedDeviceAlarms = async () => {
     `);
 
     const devices = devicesResult.rows;
+    
+    if (devices.length === 0) {
+      console.log('No devices found. Cannot create alarms.');
+      return;
+    }
+    
     const alarmData = [];
 
     // Generate realistic alarms for devices
     const now = new Date();
-    let alarmId = 1;
 
     for (const device of devices) {
       // Generate 2-5 alarms per device
@@ -161,8 +171,8 @@ const seedDeviceAlarms = async () => {
         }
 
         // Random status (weighted towards active/unacked)
-        const statusWeights = [1, 1, 1, 4, 2, 3]; // More active and unacked alarms
-        const statusId = statusWeights[Math.floor(Math.random() * statusWeights.length)];
+        const statusOptions = [1, 1, 1, 2, 3]; // More active alarms
+        const statusId = statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
         // Random time in the last 30 days
         const createdAt = new Date(now.getTime() - (Math.random() * 30 * 24 * 60 * 60 * 1000));
@@ -188,13 +198,11 @@ const seedDeviceAlarms = async () => {
 
         const metadata = {
           device_type: device.type_name,
-          severity_level: ['Critical', 'Major', 'Minor', 'Warning'][Math.floor(Math.random() * 4)],
           auto_generated: true,
           source: 'system_monitor'
         };
 
         alarmData.push({
-          id: alarmId++,
           device_serial: device.serial_number,
           alarm_type_id: alarmTypeId,
           message: messages[alarmTypeId] || 'System alarm triggered',
@@ -214,10 +222,9 @@ const seedDeviceAlarms = async () => {
       const placeholders = [];
       
       batch.forEach((alarm, index) => {
-        const baseIndex = index * 8;
-        placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7}, $${baseIndex + 8})`);
+        const baseIndex = index * 7;
+        placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7})`);
         values.push(
-          alarm.id,
           alarm.device_serial,
           alarm.alarm_type_id,
           alarm.message,
@@ -230,7 +237,7 @@ const seedDeviceAlarms = async () => {
       
       if (values.length > 0) {
         await database.query(`
-          INSERT INTO device_alarms (id, device_serial, alarm_type_id, message, metadata, status_id, created_at, updated_at) 
+          INSERT INTO device_alarms (device_serial, alarm_type_id, message, metadata, status_id, created_at, updated_at) 
           VALUES ${placeholders.join(', ')}
         `, values);
       }
@@ -284,6 +291,7 @@ const seedDeviceAlarms = async () => {
 };
 
 const seedAlarms = async () => {
+  await seedAlarmTables();
   await seedAlarmTables();
   await seedAlarmTypes();
   await seedAlarmStatuses();

@@ -72,7 +72,7 @@ class DeviceAlarm {
 
     // Build dynamic WHERE conditions
     if (hierarchy_id) {
-      whereConditions.push(`h.id = $${paramIndex}`);
+      whereConditions.push(`d.hierarchy_id = $${paramIndex}`);
       queryParams.push(hierarchy_id);
       paramIndex++;
     }
@@ -115,7 +115,7 @@ class DeviceAlarm {
       FROM device_alarms da
       JOIN alarm_types at ON da.alarm_type_id = at.id
       JOIN alarm_status_type ast ON da.status_id = ast.id
-      LEFT JOIN device d ON da.device_serial = d.serial_number
+      LEFT JOIN device d ON da.device_serial = d.serial_number AND d.company_id = $1
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
       LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id
@@ -133,7 +133,7 @@ class DeviceAlarm {
       FROM device_alarms da
       JOIN alarm_types at ON da.alarm_type_id = at.id
       JOIN alarm_status_type ast ON da.status_id = ast.id
-      LEFT JOIN device d ON da.device_serial = d.serial_number
+      LEFT JOIN device d ON da.device_serial = d.serial_number AND d.company_id = $1
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
       LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN company c ON d.company_id = c.id

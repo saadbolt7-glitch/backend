@@ -42,6 +42,9 @@ router.get('/', protect, async (req, res) => {
       sort_order: sort_order.toUpperCase()
     };
 
+    console.log('Fetching alarms for company_id:', company_id);
+    console.log('Filters:', filters);
+
     let result;
     if (hierarchy_id) {
       // Get alarms for specific hierarchy and its children
@@ -51,8 +54,12 @@ router.get('/', protect, async (req, res) => {
       result = await DeviceAlarm.findByCompany(company_id, filters);
     }
 
+    console.log('Query result:', result);
+
     // Get alarm statistics
     const statistics = await DeviceAlarm.getAlarmStatistics(company_id, hierarchy_id ? parseInt(hierarchy_id) : null);
+
+    console.log('Statistics:', statistics);
 
     res.json({
       success: true,

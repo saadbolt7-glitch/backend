@@ -133,11 +133,11 @@ const startServer = async () => {
   // Seed device types
   // Seed hierarchy data
   const seedHierarchy = require('./utils/seedHierarchy');
-  seedHierarchy().catch((err) => console.error('seedHierarchy error:', err));
+  await seedHierarchy().catch((err) => console.error('seedHierarchy error:', err));
   
   // Seed alarms data
   const seedAlarms = require('./utils/seedAlarms');
-  seedAlarms().catch((err) => console.error('seedAlarms error:', err));
+  await seedAlarms().catch((err) => console.error('seedAlarms error:', err));
 
   server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
