@@ -284,10 +284,10 @@ const seedDeviceAlarms = async () => {
 };
 
 const seedAlarms = async () => {
-  // await seedAlarmTables();
-  // await seedAlarmTypes();
-  // await seedAlarmStatuses();
-  // await seedDeviceAlarms();
+  await seedAlarmTables();
+  await seedAlarmTypes();
+  await seedAlarmStatuses();
+  await seedDeviceAlarms();
 };
 
 module.exports = seedAlarms;

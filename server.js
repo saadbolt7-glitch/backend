@@ -83,6 +83,7 @@ const hierarchyRoutes = require('./routes/hierarchy');
 const hierarchyLevelRoutes = require('./routes/hierarchyLevel');
 const chartsRoutes = require('./routes/charts');
 const devicesRoutes = require('./routes/devices');
+const alarmsRoutes = require('./routes/alarms');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -91,6 +92,7 @@ app.use('/api/hierarchy', hierarchyRoutes);
 app.use('/api/hierarchy-level', hierarchyLevelRoutes);
 app.use('/api/charts', chartsRoutes);
 app.use('/api/devices', devicesRoutes);
+app.use('/api/alarms', alarmsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -132,6 +134,10 @@ const startServer = async () => {
   // Seed hierarchy data
   const seedHierarchy = require('./utils/seedHierarchy');
   seedHierarchy().catch((err) => console.error('seedHierarchy error:', err));
+  
+  // Seed alarms data
+  const seedAlarms = require('./utils/seedAlarms');
+  seedAlarms().catch((err) => console.error('seedAlarms error:', err));
 
   server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

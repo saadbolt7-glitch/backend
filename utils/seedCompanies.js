@@ -13,34 +13,34 @@ const initialCompanies = [
 ];
 
 const seedCompanies = async () => {
-  // try {
-  //   // Check if companies already exist
-  //   const existingCompanies = await Company.findAll();
+  try {
+    // Check if companies already exist
+    const existingCompanies = await Company.findAll();
     
-  //   if (existingCompanies.length > 0) {
-  //     console.log('Companies already exist in database. Skipping seed.');
-  //     return;
-  //   }
+    if (existingCompanies.length > 0) {
+      console.log('Companies already exist in database. Skipping seed.');
+      return;
+    }
 
-  //   // Insert initial companies
-  //   for (const companyData of initialCompanies) {
-  //     // await Company.create(companyData);
-  //   }
+    // Insert initial companies
+    for (const companyData of initialCompanies) {
+      await Company.create(companyData);
+    }
     
-  //   console.log('✅ Initial companies seeded successfully');
+    console.log('✅ Initial companies seeded successfully');
     
-  //   // Log the seeded companies
-  //   const companies = await Company.findAll();
-  //   console.log('\n📋 Approved companies and domains:');
-  //   companies.forEach(company => {
-  //     console.log(`  • ${company.name}: ${company.domain_name}`);
-  //   });
-  //   console.log('');
+    // Log the seeded companies
+    const companies = await Company.findAll();
+    console.log('\n📋 Approved companies and domains:');
+    companies.forEach(company => {
+      console.log(`  • ${company.name}: ${company.domain_name}`);
+    });
+    console.log('');
     
-  // } catch (error) {
-  //   console.error('❌ Error seeding companies:', error);
-  //   throw error;
-  // }
+  } catch (error) {
+    console.error('❌ Error seeding companies:', error);
+    throw error;
+  }
 };
 
 module.exports = seedCompanies;

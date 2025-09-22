@@ -542,11 +542,11 @@ const seedUserHierarchy = async () => {
 };
 
 const seedHierarchy = async () => {
-  // await seedHierarchyLevels();
-  // await seedDeviceTypes();
-  // await seedHierarchyData();
-  // await seedDeviceDataMapping();
-  // await seedUserHierarchy();
+  await seedHierarchyLevels();
+  await seedDeviceTypes();
+  await seedHierarchyData();
+  await seedDeviceDataMapping();
+  await seedUserHierarchy();
 };
 
 module.exports = seedHierarchy;
