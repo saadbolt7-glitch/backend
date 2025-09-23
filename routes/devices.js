@@ -95,7 +95,7 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
         COALESCE((l.data->>'PressureAvg')::numeric, 0) AS pressure,
         COALESCE((l.data->>'TemperatureAvg')::numeric, 0) AS temperature
       FROM devices d
-      LEFT JOIN device_latest l ON l.device_id = d.id
+      LEFT JOIN device_latest l ON l.serial_number = d.device_serial
     `;
 
     const queryParams = [hierarchyId];
@@ -147,7 +147,7 @@ router.get('/hierarchy/:hierarchyId', protect, async (req, res) => {
         COUNT(DISTINCT d.hierarchy_id) as locations
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN device_latest l ON l.device_id = d.id
+      LEFT JOIN device_latest l ON l.serial_number = d.serial_number
       WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte)
     `;
 
@@ -279,7 +279,7 @@ router.get('/', protect, async (req, res) => {
       JOIN device_type dt ON d.device_type_id = dt.id
       LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN device_latest l ON l.device_id = d.id
+      LEFT JOIN device_latest l ON l.serial_number= d.serial_number
       WHERE d.company_id = $1
     `;
 
@@ -321,7 +321,7 @@ router.get('/', protect, async (req, res) => {
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
       LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
-      LEFT JOIN device_latest l ON l.device_id = d.id
+      LEFT JOIN device_latest l ON l.serial_number= d.serial_number
       WHERE d.company_id = $1
     `;
 
@@ -358,7 +358,7 @@ router.get('/', protect, async (req, res) => {
         COUNT(DISTINCT dt.type_name) as device_types
       FROM device d
       JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN device_latest l ON l.device_id = d.id
+      LEFT JOIN device_latest l ON l.serial_number= d.serial_number
       WHERE d.company_id = $1
     `;
 
@@ -475,7 +475,7 @@ router.get('/:id', protect, async (req, res) => {
       JOIN company c ON d.company_id = c.id
       LEFT JOIN hierarchy h ON d.hierarchy_id = h.id
       LEFT JOIN hierarchy_level hl ON h.level_id = hl.id
-      LEFT JOIN device_latest l ON l.device_id = d.id
+      LEFT JOIN device_latest l ON l.serial_number = d.serial_number
       WHERE d.id = $1
     `;
 

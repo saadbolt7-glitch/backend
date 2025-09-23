@@ -3,8 +3,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const database = require('./config/database');
-const seedCompanies = require('./utils/seedCompanies');
-const seedAdmin = require('./utils/seedAdmin');
+const seedCompanies = require('./scripts/seedCompanies');
+const seedAdmin = require('./scripts/seedAdmin');
 const cors = require('cors');
 
 // Load environment variables
@@ -106,7 +106,7 @@ app.get('/api/health', (req, res) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: `Route not found: ${req.originalUrl}`
   });
 });
 
@@ -127,17 +127,13 @@ const startServer = async () => {
   await database.connect();
 
   // Run seeders (do not block start if they fail)
-  seedCompanies().catch((err) => console.error('seedCompanies error:', err));
-  seedAdmin().catch((err) => console.error('seedAdmin error:', err));
+  //seedCompanies().catch((err) => console.error('seedCompanies error:', err));
+  //seedAdmin().catch((err) => console.error('seedAdmin error:', err));
   
   // Seed device types
   // Seed hierarchy data
-  const seedHierarchy = require('./utils/seedHierarchy');
-  await seedHierarchy().catch((err) => console.error('seedHierarchy error:', err));
-  
-  // Seed alarms data
-  const seedAlarms = require('./utils/seedAlarms');
-  await seedAlarms().catch((err) => console.error('seedAlarms error:', err));
+  //const seedHierarchy = require('./utils/seedHierarchy');
+  //seedHierarchy().catch((err) => console.error('seedHierarchy error:', err));
 
   server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
@@ -146,19 +142,19 @@ const startServer = async () => {
   });
 
   // Graceful handling of listen errors (e.g. EADDRINUSE)
-  server.on('error', (err) => {
-    if (err && err.code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is already in use (EADDRINUSE).`);
-      console.error('Options:');
-      console.error(`  - Kill the process using the port (Windows: netstat -ano | findstr :${PORT} -> taskkill /PID <pid> /F)`);
-      console.error(`  - Use a different PORT by setting PORT env variable (e.g. PORT=${PORT + 1} npm run dev)`);
-      console.error(`  - Use npx kill-port ${PORT}`);
-      process.exit(1);
-    } else {
-      console.error('Server error:', err);
-      process.exit(1);
-    }
-  });
+  // server.on('error', (err) => {
+  //   if (err && err.code === 'EADDRINUSE') {
+  //     console.error(`Port ${PORT} is already in use (EADDRINUSE).`);
+  //     console.error('Options:');
+  //     console.error(`  - Kill the process using the port (Windows: netstat -ano | findstr :${PORT} -> taskkill /PID <pid> /F)`);
+  //     console.error(`  - Use a different PORT by setting PORT env variable (e.g. PORT=${PORT + 1} npm run dev)`);
+  //     console.error(`  - Use npx kill-port ${PORT}`);
+  //     process.exit(1);
+  //   } else {
+  //     console.error('Server error:', err);
+  //     process.exit(1);
+  //   }
+  // });
 };
 
 // Graceful shutdown

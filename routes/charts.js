@@ -127,7 +127,7 @@ SELECT d.*,
 FROM device d
 LEFT JOIN device_type dt   ON d.device_type_id = dt.id
 LEFT JOIN hierarchy h      ON d.hierarchy_id = h.id
-LEFT JOIN device_latest dl ON d.id = dl.device_id
+LEFT JOIN device_latest dl ON d.serial_number = dl.serial_number
 WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte)
 ORDER BY d.serial_number;
     `;
@@ -207,9 +207,9 @@ router.get('/device/:deviceId/realtime', protect, async (req, res) => {
         d.serial_number,
         dt.type_name as device_type
       FROM device_latest dl
-      JOIN device d ON dl.device_id = d.id
+      JOIN device d ON dl.serial_number = d.serial_number
       JOIN device_type dt ON d.device_type_id = dt.id
-      WHERE dl.device_id = $1
+      WHERE d.id = $1
     `;
 
     const result = await database.query(query, [deviceId]);

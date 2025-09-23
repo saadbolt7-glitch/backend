@@ -59,7 +59,7 @@ class Hierarchy {
       JOIN company c ON h.company_id = c.id
       LEFT JOIN device d ON h.id = d.hierarchy_id
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN device_latest dl ON d.id = dl.device_id
+      LEFT JOIN device_latest dl ON d.serial_number= dl.serial_number
     `;
     
     const params = [];

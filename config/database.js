@@ -22,7 +22,7 @@ class Database {
       client.release();
 
       // Initialize database schema
-      await this.initializeSchema();
+      //await this.initializeSchema();
     } catch (error) {
       console.error('Database connection error:', error.message || error);
       console.log('\n📋 To fix this error:');

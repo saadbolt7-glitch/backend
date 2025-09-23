@@ -143,7 +143,7 @@ class Device {
         ${selectFields},
         COUNT(*) as data_points
       FROM device_data dd
-      WHERE dd.device_id = $1 AND ${timeFilter}
+      WHERE dd.serial_number = $1 AND ${timeFilter}
       GROUP BY ${groupBy}
       ORDER BY time_period
     `;
@@ -179,7 +179,7 @@ class Device {
     }
 
     const query = `
-      WITH RECURSIVE hierarchy_cte AS (
+WITH RECURSIVE hierarchy_cte AS (
         -- Start from the selected hierarchy
         SELECT id
         FROM hierarchy
@@ -195,7 +195,7 @@ class Device {
       device_data_minute AS (
         -- Average per device per time period
         SELECT 
-          dd.device_id,
+          dd.serial_number as device_id,
           ${groupBy} AS minute,
           AVG((dd.data->>'GFR')::numeric) AS avg_gfr,
           AVG((dd.data->>'GOR')::numeric) AS avg_gor,
@@ -206,9 +206,9 @@ class Device {
           AVG((dd.data->>'PressureAvg')::numeric) AS avg_pressure,
           AVG((dd.data->>'TemperatureAvg')::numeric) AS avg_temp
         FROM device_data dd
-        JOIN device d ON d.id = dd.device_id
+        JOIN device d ON d.serial_number= dd.serial_number
         WHERE d.hierarchy_id IN (SELECT id FROM hierarchy_cte) AND ${timeFilter}
-        GROUP BY dd.device_id, ${groupBy}
+        GROUP BY dd.serial_number, ${groupBy}
       ),
       summed AS (
         -- Sum across devices per time period
@@ -250,9 +250,9 @@ class Device {
         d.serial_number,
         dt.type_name as device_type
       FROM device_data dd
-      JOIN device d ON dd.device_id = d.id
+      JOIN device d ON dd.serial_number = d.serial_number
       JOIN device_type dt ON d.device_type_id = dt.id
-      WHERE dd.device_id = $1
+      WHERE dd.serial_number = $1
       ORDER BY dd.created_at DESC
       LIMIT 1
     `;
@@ -271,6 +271,7 @@ class Device {
 
         UNION ALL
 
+
         SELECT h.id, h.name, h.level_id
         FROM hierarchy h
         JOIN hierarchy_cte c ON h.parent_id = c.id
@@ -287,7 +288,7 @@ class Device {
       JOIN hierarchy_level hl ON h.level_id = hl.id
       LEFT JOIN device d ON h.id = d.hierarchy_id
       LEFT JOIN device_type dt ON d.device_type_id = dt.id
-      LEFT JOIN device_data dd ON d.id = dd.device_id AND dd.created_at >= date_trunc('day', now())
+      LEFT JOIN device_data dd ON d.serial_number= dd.serial_number AND dd.created_at >= date_trunc('day', now())
       GROUP BY h.id, h.name, hl.name, d.id, d.serial_number, dt.type_name
       ORDER BY h.id, d.serial_number
     `;
